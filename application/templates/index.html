@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<title>Collective Intelligence</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<!--USE FOR CDN/CLOUD DEPLOYMENT-->
+<script src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
+        id="sap-ui-bootstrap"
+        data-sap-ui-theme="sap_belize"
+        data-sap-ui-libs="sap.m", "sap.suite.ui.microchart">
+	"myApp": "{{ url_for('static', filename='./')}}"}'>
+</script>
+
+<!--USE FOR ON PREMISE DEPLOYMENT
+<script src="{{ url_for('static', filename='resources/sap-ui-core.js')}}"
+        id="sap-ui-bootstrap"
+        data-sap-ui-theme="sap_belize"
+        data-sap-ui-libs="sap.m", "sap.suite.ui.microchart"
+        data-sap-ui-resourceroots='{
+        "myApp": "{{ url_for('static', filename='./')}}"}'>
+</script>
+-->
+<!--LAUNCHPAD-->
+<script id="vLaunchpad" type="ui5/xmlview"   title="COIN">
+<mvc:View
+        controllerName="local.controller.app"
+        xmlns="sap.m"
+        xmlns:mvc="sap.ui.core.mvc"
+        xmlns:mc="sap.suite.ui.microchart"
+        xmlns:f="sap.ui.layout.form"
+        xmlns:html="http://www.w3.org/1999/xhtml"
+        xmlns:tnt="sap.tnt"
+        xmlns:vbm="sap.ui.vbm"
+        xmlns:l="sap.ui.layout"
+        >
+        <App>
+        <Page title="Home" id="Launchpad">
+        <tnt:ToolHeader>
+                <Image
+                 src="{{ url_for('static', filename='saplogo.svg')}}"
+                 width="80px"
+                 >
+                </Image>
+        <tnt:ToolHeaderUtilitySeparator />
+                <ToolbarSpacer>
+                </ToolbarSpacer>
+                <Button text="{{ session.username }}" id="NameHeader" type="Transparent" press="onUserNamePress">
+                </Button>
+                <Button icon="sap-icon://log" press="onPressLogOut" type="Transparent">
+                </Button>
+		<Button icon="sap-icon://reset" press="onPressReset" type="Transparent">
+		</Button>
+		<Button icon="sap-icon://upload" press="onPressLoadVPData" type="Transparent">
+		</Button>
+
+        </tnt:ToolHeader>
+        <Panel expandable="true" headerText="Applications" expanded="true">
+        <content>
+                <GenericTile
+                          class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout"
+                          header="Manage Alerts"
+                          subheader="Think Families"
+                          press="TFAlerts">
+                            <TileContent footer="High Priority" >
+                             <NumericContent value="{{ session.alerts }}" valueColor="Good"  />
+                            </TileContent>
+                </GenericTile>
+		<GenericTile
+			  class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout"
+			  header="Programme Management"
+			  subheader="Forms and KPIs"
+			  press="TFProgramme">
+			    <TileContent footer="Progression to goal">
+				<mc:BulletMicroChart size="XS" scale="M" targetValue="100" forecastValue="110" class="sapUiSmallMarginBegin" press="press">
+					<mc:actual>
+						<mc:BulletMicroChartData value="120" color="Good"/>
+					</mc:actual>
+					<mc:thresholds>
+						<mc:BulletMicroChartData value="0" color="Error"/>
+						<mc:BulletMicroChartData value="50" color="Critical"/>
+						<mc:BulletMicroChartData value="150" color="Critical"/>
+						<mc:BulletMicroChartData value="200" color="Error"/>
+					</mc:thresholds>
+				</mc:BulletMicroChart>
+			    </TileContent>
+		</GenericTile>
+                <SlideTile class="sapUiTinyMarginBegin sapUiTinyMarginTop tileLayout">
+                        <tiles>
+                                <GenericTile
+                                        backgroundImage="{{ url_for('static', filename='police.jpg')}}"
+                                        frameType="TwoByOne" press="onPressLoadPolice">
+                                        <TileContent footer="8 hours ago">
+                                                <NewsContent
+                                                        contentText="Last data upload from Police resulted in 4 new attachments."
+                                                        subheader="Police data" />
+                                        </TileContent>
+                                </GenericTile>
+                                <GenericTile
+                                        backgroundImage="{{ url_for('static', filename='saplogo.svg')}}"
+                                        frameType="TwoByOne" press="onPressLoadEducation">
+                                        <TileContent footer="3 days ago">
+                                                <NewsContent
+                                                        contentText="Increased absences from education with 1 existing family"
+                                                        subheader="Education data" />
+                                        </TileContent>
+                                </GenericTile>
+				<GenericTile
+					backgroundImage="{{ url_for('static', filename='person.png')}}"
+					frameType="TwoByOne" press="onPressTED_DV">
+					<TileContent footer="TED_DV files">
+						<NewsContent
+							contentText="Last extract from TED_DV resulted in 5 new attachments."
+							subheader="Users" />
+					</TileContent>
+				</GenericTile>
+                        </tiles>
+                </SlideTile>
+        </content>
+        </Panel>
+        <Panel expandable="true" headerText="Messages" expanded="true">
+        <content>
+                <List id="NewMessages">
+                        <items>
+                        <StandardListItem title="Requsts for Information" type="Navigation" description="Sample message in an alert. Can navigate to the detail" press="onPressNavToTasks"/>
+                        </items>
+                </List>  
+        </content>
+        </Panel>
+                <vbm:AnalyticMap id="LaunchpadMap">
+                </vbm:AnalyticMap>
+        </Page>
+        </App>
+</mvc:View>
+</script>
+
+<!--LOGIN -->
+<script id="vLogin" type="ui5/xmlview">
+<mvc:View
+    controllerName="local.controller"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    >
+        <App>
+        <Page title="Collective Intelligence Login" id="Login">
+                <content>
+                        <VBox fitContainer="true" justifyContent="Center" alignItems="Center" alignContent="Center">
+                                <Input id="UserName" placeholder="User name"></Input>
+                                <Input id="UserPassword" placeholder="Password" type="Password"></Input>
+                                <Button width="12rem" text="Login" type="Emphasized" press="onLoginTap"></Button>
+                        </VBox>
+                </content>
+        </Page>
+        </App>
+</mvc:View>
+</script>
+
+<script id="vProfile" type="ui5/xmlview">
+	<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+	controllerName="local.controller.app"
+	xmlns="sap.m"
+	xmlns:g="sap.suite.ui.commons.networkgraph"
+	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:viz="sap.viz.ui5.controls"
+	xmlns:smartchart="sap.ui.comp.smartchart"
+	xmlns:mc="sap.suite.ui.microchart"
+	xmlns:viz.data="sap.viz.ui5.data"
+	xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+	xmlns:vbm="sap.ui.vbm"
+	xmlns:layout="sap.suite.ui.commons.networkgraph.layout"
+	xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:vk="sap.ui.vk">
+	<SplitApp id="SplitAppDemo" initialDetail="Profiles" initialMaster="ProfileMenu" orientationChange="onOrientationChange">
+		<detailPages>
+		<!--PROFILE PAGE-->
+			<Page id="Profiles" title="User Detail" class="sapUiStdPage" showNavButton="true"
+				navButtonText="Back" navButtonPress="onPressLaunchpadBack">
+				<VBox class="sapUiSmallMarginBegin">
+				<Text id="ProfileGUID" text="ID" />
+				<Text id="ProfileDescription" text="Profile Description" />
+
+				</VBox>
+				<IconTabBar
+					id="RelatedEntitiesIcons"
+					headerMode="Inline"
+					upperCase="false"
+					class="sapUiResponsiveContentPadding">
+				<items>
+					<IconTabFilter
+						text="People"
+						icon="sap-icon://person-placeholder">
+					</IconTabFilter>
+					<IconTabFilter
+						text="Objects"
+						icon="sap-icon://product">
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="Locations"
+						icon="sap-icon://map">
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="Events"
+						icon="sap-icon://calendar">
+
+					</IconTabFilter>
+				</items>
+				</IconTabBar>
+			</Page>
+		</detailPages>
+		<!--PROFILE MENU-->
+		<masterPages>
+			<Page id="ProfileMenu" title="Menu" icon="sap-icon://action" class="sapUiStdPage" showNavButton="true"
+					navButtonText="Back" navButtonPress="onPressLaunchpadBack">
+				<content>
+				<Toolbar class="sapUiSmallMarginBegin">
+				<Input
+					id="searchField"
+					width='100%'
+					class="sapUiSmallMarginBegin"
+					placeholder="Enter search terms to find entities">
+				</Input>
+				<Button text="Search" press="onPressSearchEntities" type="Emphasized" setBusy="true" class="sapUiSmallMarginBegin"/>
+				</Toolbar>
+					<List id="EntityProfiles">
+						<items>
+						</items>
+					</List>
+				</content>
+			</Page>
+		</masterPages>
+	</SplitApp>
+	</mvc:View>
+</script>
+
+<script id="vTFAlerts" type="ui5/xmlview">
+	<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+	controllerName="local.controller.app"
+	xmlns="sap.m"
+	xmlns:g="sap.suite.ui.commons.networkgraph"
+	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:viz="sap.viz.ui5.controls"
+	xmlns:smartchart="sap.ui.comp.smartchart"
+	xmlns:mc="sap.suite.ui.microchart"
+	xmlns:viz.data="sap.viz.ui5.data"
+	xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+	xmlns:vbm="sap.ui.vbm"
+	xmlns:layout="sap.suite.ui.commons.networkgraph.layout"
+	xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:vk="sap.ui.vk">
+	<SplitApp initialDetail="TFAlertsProfile" initialMaster="TFProfileMenu" orientationChange="onOrientationChange">
+		<detailPages>
+			<Page id="TFAlertsProfile" title="Alert Details" class="sapUiStdPage" showNavButton="true"
+				navButtonText="Back" navButtonPress="onPressLaunchpadBack">
+				<VBox class="sapUiSmallMargin">
+				<Text id="ProfileGUID" text="ID" />
+				<Text id="ProfileDescription" text="Profile Description" />
+				</VBox>
+				<IconTabBar
+					headerMode="Inline"
+					upperCase="false"
+					class="sapUiResponsiveContentPadding"
+					text-wrap="">
+				<items>
+					<IconTabFilter
+						text="History"
+						icon="sap-icon://customer-history">
+					</IconTabFilter>
+					<IconTabFilter
+						text="Family Members"
+						icon="sap-icon://family-protection">
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="ConDis"
+						icon="sap-icon://overview-chart">
+						<g:Graph>
+						  <g:nodes>
+						    <g:Node key="Node1" title="1" status="Error" />
+						    <g:Node key="Node2" title="1" status="Error" />
+						    <g:Node key="Node3" title="1" status="Error" />
+						  </g:nodes>
+						  <g:lines>
+						    <g:Line from="Node1" to="Node2" status="Error" />
+						      <g:Line from="Node1" to="Node3" status="Error" />
+						  </g:lines>
+						</g:Graph>
+						
+						<StandardListItem title="Connections Discovery" type="Navigation" press="onPressNavToConDis"/>
+					
+
+
+
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="Processes"
+						icon="sap-icon://performance">
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="Contact"
+						icon="sap-icon://sys-monitor">
+
+					</IconTabFilter>
+				</items>
+				</IconTabBar>
+			</Page>
+		</detailPages>
+		<masterPages>
+			<Page id="TFProfileMenu" title="Menu" icon="sap-icon://action" class="sapUiStdPage" showNavButton="true"
+					navButtonText="Back" navButtonPress="onPressLaunchpadBack">
+				<content>
+				<Toolbar>
+				<Input
+					id="TFsearchField"
+					width='100%'
+					class="sapUiSmallMarginBegin"
+					placeholder="Enter search terms to find entities">
+				</Input>
+				<Button text="Search" press="onPressSearchEntities" type="Emphasized" setBusy="true" class="sapUiSmallMarginBegin"/>
+				</Toolbar>
+					<List id="TFEntityProfiles">
+						<items>
+						</items>
+					</List>
+				</content>
+			</Page>
+		</masterPages>
+	</SplitApp>
+	</mvc:View>
+</script>
+<script id="vTFProgramme" type="ui5/xmlview">
+	<mvc:View
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns:custom="http://schemas.sap.com/sapui5/extension/sap.ui.core.CustomData/1"
+	controllerName="local.controller.app"
+	xmlns="sap.m"
+	xmlns:g="sap.suite.ui.commons.networkgraph"
+	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	xmlns:viz="sap.viz.ui5.controls"
+	xmlns:smartchart="sap.ui.comp.smartchart"
+	xmlns:mc="sap.suite.ui.microchart"
+	xmlns:viz.data="sap.viz.ui5.data"
+	xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds"
+	xmlns:vbm="sap.ui.vbm"
+	xmlns:layout="sap.suite.ui.commons.networkgraph.layout"
+	xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:vk="sap.ui.vk">
+	<Page>
+	<SplitApp id="SplitAppTF" initialDetail="TFProgramme3" initialMaster="TFProgrammeMenu" orientationChange="onOrientationChange">
+		<detailPages>
+		<Page id="TFProgramme3" title="Program Key Performance Indicators Dashboard" class="sapUiStdPage" showNavButton="true"
+				navButtonText="Back" navButtonPress="onPressLaunchpadBack">
+				<VBox class="sapUiSmallMargin">
+				<Text id="TF3-ProfileGUID" text="ID" />
+				<Text id="TF3-ProfileDescription" text="Profile Description" />
+				</VBox>
+				<IconTabBar
+					headerMode="Inline"
+					upperCase="false"
+					class="sapUiResponsiveContentPadding"
+					text-wrap="">
+				<items>
+					<IconTabFilter
+						text="PBR"
+						icon="sap-icon://goal">
+						<Text text="Eligability and PBR:\n
+							- Engaged with Target\n
+							- Engaged with Actual\n
+							- PBR Actual\n
+							Axes:\n
+							- Number engaged\n
+							- Quarter"/>
+						<Panel expandable="true" headerText="Eligability and PBR" expanded="true">	
+						<FlexBox width="50rem" height="22rem" alignItems="Center" class="sapUiSmallMargin">
+							<items>
+								<mc:InteractiveLineChart selectionChanged="selectionChanged" press="press">
+									<mc:points>
+										<mc:InteractiveLineChartPoint value="23.1" label="May" color="Normal"/>
+										<mc:InteractiveLineChartPoint value="2.2" label="June" color="Critical"/>
+										<mc:InteractiveLineChartPoint value="41.4" label="July" color="Good"/>
+										<mc:InteractiveLineChartPoint value="5.8" label="Aug" color="Critical"/>
+										<mc:InteractiveLineChartPoint value="49.9" label="Sep" color="Good" selected="true"/>
+										<mc:InteractiveLineChartPoint value="-10.2" label="Oct" color="Error"/>
+									</mc:points>
+								</mc:InteractiveLineChart>
+							</items>
+						</FlexBox>
+						</Panel>
+						
+						<Panel expandable="true" headerText="By Locality" expanded="true">	
+						<FlexBox width="50rem" height="22rem" alignItems="Center" class="sapUiSmallMargin">
+							<items>
+								<mc:InteractiveBarChart labelWidth="25%" selectionChanged="selectionChanged" press="press">
+									<mc:bars>
+										<mc:InteractiveBarChartBar label="Barnsley" value="80" displayedValue="80%"/>
+										<mc:InteractiveBarChartBar label="Doncaster" value="20" displayedValue="20%"/>
+										<mc:InteractiveBarChartBar label="Rotherham" value="70" displayedValue="70%"/>
+									</mc:bars>
+								</mc:InteractiveBarChart>
+							</items>
+						</FlexBox>
+						</Panel>
+					</IconTabFilter>
+					<IconTabFilter
+						text="Payments"
+						icon="sap-icon://lead">
+						<Text text="Payments by results performance:\n
+							- Signifanct and Sustained Progress\n
+							- Continued Employment\n
+							- Total number of outcomes\n
+							Axes:\n
+							- No of Outcomes\n
+							- By Month/Year"/>
+
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="Demographics"
+						icon="sap-icon://family-care">
+						<Text text="Breakdown of various aspects by region:\n
+							- Age: over 18, 5-18, under 5\n
+							- Gender: Male, Female\n
+							- Ethnicity: White, Non-white, Unknown\n
+							- Family Size: 2-10+\n"/>
+					
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="Children"
+						icon="sap-icon://wounds-doc">
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="DV"
+						icon="sap-icon://family-protection">
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="Data Sources"
+						icon="sap-icon://database">
+						<VBox class="sapUiSmallMargin">
+						<Button text="TED-Cohort" icon="sap-icon://synchronize" press="onPressTED_Cohort" type="Transparent"/>
+						<Button text="TED-DV" icon="sap-icon://synchronize" press="onPressTED_DV" type="Transparent"/>
+						</VBox>
+					</IconTabFilter>
+				</items>
+				</IconTabBar>
+			</Page>
+		<Page id="TFProgramme2" title="Update Program Status" class="sapUiStdPage" showNavButton="true"
+				navButtonText="Back" navButtonPress="onPressLaunchpadBack">
+				<VBox class="sapUiSmallMargin">
+				<Text id="TF2-ProfileGUID" text="ID" />
+				<Text id="TF2-ProfileDescription" text="Profile Description" />
+				</VBox>
+				<IconTabBar
+					headerMode="Inline"
+					upperCase="false"
+					class="sapUiResponsiveContentPadding"
+					text-wrap="">
+				<items>
+					<IconTabFilter
+						text="Crime|ASB"
+						icon="sap-icon://badge">
+							<Text text="Identifying criteria:\n
+							- Youth and Adult Crime\n
+							- Anti-Social Behaviour\n
+							Data Sources:\n
+							- Civica\n
+							- PNC"/>
+					</IconTabFilter>
+					<IconTabFilter
+						text="School"
+						icon="sap-icon://study-leave">
+							<Text text="Identifying criteria:\n
+							- Attendance below 30%\n
+							- Primary school age 5 or more school days FTE last 3 consecutive terms\n
+							- Secondary school are 10 or more school days FTE last 3 consecutive terms\n
+							- Alternative educational provision for behavioural problems\n
+							- Not on roll\n
+							- Missing from education\n
+							Data Sources:\n
+							- Absences: Civica, PNC, TED\n
+							- Other: Capita"/>
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="Work"
+						icon="sap-icon://monitor-payments">
+							<Text text="Identifying criteria:\n
+							- Adult receives out of work benefits\n
+							- Risk of NEET: 16 years, no qualifications,planned education, training or employment\n
+							- NEET: 16-18 years and not in education, training, or employment\n
+							- Debt: Variety of signals from tax and rent arrears, credit card companies and housing providers\n
+							- Unclaimed benefit: Parents and family not accessing appropriate benefits\n
+							Data Sources:\n
+							- Capita Academy"/>
+					
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="Children"
+						icon="sap-icon://wounds-doc">
+
+					</IconTabFilter>
+					<IconTabFilter
+						text="DV"
+						icon="sap-icon://family-protection">
+
+					</IconTabFilter>
+				</items>
+				</IconTabBar>
+			</Page>
+			<Page id="TFProgramme1" title="New Programme Entries" class="sapUiStdPage" showNavButton="true"
+				navButtonText="Back" navButtonPress="onPressLaunchpadBack">
+				<IconTabBar
+					headerMode="Inline"
+					upperCase="false"
+					class="sapUiResponsiveContentPadding"
+					text-wrap="">
+				<items>
+				<IconTabFilter
+					text="Demographics"
+					icon="sap-icon://add-contact">
+				<f:Form editable="false">
+					<f:title>
+						<core:Title text="New entry demographics" />
+					</f:title>
+					<f:layout>
+						<f:ResponsiveGridLayout
+							labelSpanXL="4"
+							labelSpanL="4"
+							labelSpanM="12"
+							labelSpanS="12"
+							adjustLabelSpan="false"
+							emptySpanXL="0"
+							emptySpanL="0"
+							emptySpanM="0"
+							emptySpanS="0"
+							columnsXL="2"
+							columnsL="2"
+							columnsM="1"
+							singleContainerFullSize="false" />
+					</f:layout>
+					<f:formContainers>
+					<f:FormContainer title="Basic Data">
+						<f:formElements>
+							<f:FormElement label="Forename">
+								<f:fields>
+								<Input
+									id="TF-Forename"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Middle name(s)">
+								<f:fields>
+								<Input
+									id="TF-Middlename"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Surname">
+								<f:fields>
+								<Input
+									id="TF-Surname"
+									placeholder="Individual's last name"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="SBirthday">
+								<f:fields>
+									<DateTimePicker
+									id="TF-DOB"
+									placeholder="Date of birth"
+									valueFormat="YYYY-MM-dd HH:mm:ss" displayFormat="short"
+									change="handleChange"
+									class="sapUiSmallMarginBottom"
+									/>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Gender">
+								<f:fields>
+								<Select
+									id="TF-Gender"
+									placeholder="Individual's identified gender"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Female"    key="F"/>
+										<core:Item text="Male"      key="M"/>
+										<core:Item text="Unknown"   key="U"/>
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Ethnicity">
+								<f:fields>
+								<Select
+									id="TF-Ethnicity"
+									placeholder="Individual's ethnicity from list"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Bangladeshi"               key="TF-Bangladeshi"/>
+										<core:Item text="Indian"                    key="TF-Indian"/>
+										<core:Item text="Pakistani"                 key="TF-Pakistani"/>
+										<core:Item text="Any other Asian"           key="TF-AnyOtherAsian"/>
+										<core:Item text="African"                   key="TF-African"/>
+										<core:Item text="Caribbean"                 key="TF-Caribbean"/>
+										<core:Item text="Any other Black"           key="TF-AnyOtherBlack"/>
+										<core:Item text="Chinese"                   key="TF-Chinese"/>
+										<core:Item text="White and Asian"           key="TF-WhiteAndAsian"/>
+										<core:Item text="White and Black African"   key="TF-WhiteBlackAfrican"/>
+										<core:Item text="White and Black Caribbean" key="TF-WhiteAndABlackCaribbean"/>
+										<core:Item text="White and Mixed"           key="TF-WhiteAndMixed"/>
+										<core:Item text="White and Asian"           key="TF-WhiteAndAsian"/>
+										<core:Item text="White British"             key="TF-WhiteAndBritish"/>
+										<core:Item text="White Irish"               key="TF-WhiteAndIrish"/>
+										<core:Item text="Any other White"           key="TF-AnyOtherWhite"/>
+										<core:Item text="Other"                     key="TF-Other"/>
+										<core:Item text="Not known"                 key="TF-NotKnown"/>
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+						</f:formElements>
+					</f:FormContainer>
+					<f:FormContainer title="Family">
+						<f:formElements>
+							<f:FormElement label="Parent">
+								<f:fields>
+								<Input
+									id="TF-Parent"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Grandparent">
+								<f:fields>
+								<Input
+									id="TF-Grandparent"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Dependent child">
+								<f:fields>
+								<Input
+									id="TF-Dependent"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Other adult">
+								<f:fields>
+								<Input
+									id="TF-OtherAdult"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Other child">
+								<f:fields>
+								<Input
+									id="TF-OtherChild"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+						</f:formElements>
+					</f:FormContainer>
+				</f:formContainers>
+			</f:Form>
+			<f:Form 
+				editable="false">
+				<f:title>
+					<core:Title text="Address" />
+				</f:title>
+				<f:layout>
+					<f:ResponsiveGridLayout
+						labelSpanXL="4"
+						labelSpanL="4"
+						labelSpanM="12"
+						labelSpanS="12"
+						adjustLabelSpan="false"
+						emptySpanXL="0"
+						emptySpanL="0"
+						emptySpanM="0"
+						emptySpanS="0"
+						columnsXL="2"
+						columnsL="2"
+						columnsM="1"
+						singleContainerFullSize="false" />
+				</f:layout>
+				<f:formContainers>
+					<f:FormContainer title="Home location">
+						<f:formElements>
+							<f:FormElement label="Address">
+								<f:fields>
+								<Input
+									id="TF-Address"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Postcode">
+								<f:fields>
+								<Input
+									id="TF-PostCode"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Housing Tenure">
+								<f:fields>
+								<Select
+									id="TF-HousingTenure"
+									placeholder="Individual's ethnicity from list"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Private Rent"       key="TF-PrivateRent"/>
+										<core:Item text="HA or LA rent"      key="TF-HALA"/>
+										<core:Item text="Owner Occupied"     key="TF-OwnerOccupied"/>
+										<core:Item text="No Fixed Abode"     key="TF-NoFixed"/>
+										<core:Item text="Temporary accommodation provided by LA" key="TF-Temporary"/>
+										<core:Item text="Other"              key="TF-OtherHousing"/>
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+						</f:formElements>
+					</f:FormContainer>
+				</f:formContainers>
+			</f:Form>
+			</IconTabFilter>
+			<IconTabFilter
+					text="Intervention"
+					icon="sap-icon://activity-items">
+				<f:Form editable="false">
+					<f:title>
+						<core:Title text="Event circumstances and details" />
+					</f:title>
+					<f:layout>
+						<f:ResponsiveGridLayout
+							labelSpanXL="4"
+							labelSpanL="4"
+							labelSpanM="12"
+							labelSpanS="12"
+							adjustLabelSpan="false"
+							emptySpanXL="0"
+							emptySpanL="0"
+							emptySpanM="0"
+							emptySpanS="0"
+							columnsXL="2"
+							columnsL="2"
+							columnsM="1"
+							singleContainerFullSize="false" />
+					</f:layout>
+					<f:formContainers>
+					<f:FormContainer title="About the intervention">
+						<f:formElements>
+							<f:FormElement label="Start date of intervention">
+								<f:fields>
+									<DateTimePicker
+									id="TF-StartDate"
+									placeholder="Start date of intervention"
+									valueFormat="YYYY-MM-dd HH:mm:ss" displayFormat="short"
+									change="handleChange"
+									class="sapUiSmallMarginBottom"
+									/>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Intervention status">
+								<f:fields>
+								<Select
+									id="TF-InterventionStatus"
+									placeholder="Intervention standard"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Open"              key="Open"/>
+										<core:Item text="Disengaged"        key="Disengaged"/>
+										<core:Item text="Closed Successful" key="ClosedSuccessful"/>
+										<core:Item text="Closed Unsuccessful" key="ClosedUnsuccessful"/>
+										<core:Item text="Moved out of area" key="ClosedSuccess"/>
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="End date of intervention">
+								<f:fields>
+									<DateTimePicker
+									id="TF-EndDate"
+									placeholder="End date of intervention"
+									valueFormat="YYYY-MM-dd HH:mm:ss" displayFormat="short"
+									change="handleChange"
+									class="sapUiSmallMarginBottom"
+									/>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Allocated Worker">
+								<f:fields>
+								<Input
+									id="TF-AllocatedWorker"
+									class="sapUiSmallMarginBottom"
+									>
+								</Input>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Explicit Consent from family to share with MHCLG">
+								<f:fields>
+								<Select
+									id="TF-ExplicitConsent"
+									placeholder="None"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Not requested"   key="NotRequested"/>
+										<core:Item text="Given"           key="Given"/>
+										<core:Item text="Not Given"       key="NotGiven"/>
+										<core:Item text="Withdrawn"       key="Withdrawn"/>
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Do you require support from an Employment Advisor?">
+								<f:fields>
+								<RadioButtonGroup id='TF-TFEASupport' valueState="Warning">
+									<buttons>
+										<RadioButton text="Yes"/>
+										<RadioButton text="No"/>
+									</buttons>
+								</RadioButtonGroup>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Do you require support from an Education Welfate Officer?">
+								<f:fields>
+								<RadioButtonGroup id='TF-TFEWOSupport' valueState="Warning">
+									<buttons>
+										<RadioButton text="Yes"/>
+										<RadioButton text="No"/>
+									</buttons>
+								</RadioButtonGroup>
+								</f:fields>
+							</f:FormElement>
+						</f:formElements>
+					</f:FormContainer>
+					<f:FormContainer title="Eligibility for TF Programme">
+						<f:formElements>
+							<f:FormElement label="Issue (Crime/ASB)">
+								<f:fields>
+								<Select
+									id="TF-IssueCrimeASB"
+									placeholder="None"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Proven Offending"        key="ProvenOffending"/>
+										<core:Item text="Anti-social Behavior"    key="Anti-socialBehavior"/>
+										<core:Item text="Other Criminal Behavior" key="OtherCriminal Behavior"/>
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Issue (Education)">
+								<f:fields>
+								<Select
+									id="TF-IssueEducation"
+									placeholder="None"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Attendance"        key="Attendance"/>
+										<core:Item text="Exclusions"        key="Exclusions"/>
+										<core:Item text="Other educational" key="Othereducational"/>
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Issue (Financial Exclusion)">
+								<f:fields>
+								<Select
+									id="TF-IssueFinancial"
+									placeholder="None"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Benefits"          key="Benefits"/>
+										<core:Item text="Debt"              key="Debt"/>
+										<core:Item text="NEET"              key="NEET"/>
+										<core:Item text="Risk of NEET"      key="RiskofNEET"/>
+										<core:Item text="Other Financial"   key="OtherFinncial"/>
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Issue (Children who need help)">
+								<f:fields>
+								<Select
+									id="TF-ChildrenNeedHelp"
+									placeholder="None"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Looked after"               key="LookedAfter"/>
+										<core:Item text="Child Protection Plan"      key="ChildProtectionPlan"/>
+										<core:Item text="Child in Need"              key="ChildInNeed"/>
+										<core:Item text="Early Help"                 key="EarlyHelp"/>
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Issue (Domestic Violence and Abuse)">
+								<f:fields>
+								<Select
+									id="TF-DomesticAbuse"
+									placeholder="None"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Police callouts"        key="PoliceCallout"/>
+										<core:Item text="Dv without police"      key="DvWithoutPolice"/>  
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+							<f:FormElement label="Issue (Health)">
+								<f:fields>
+								<Select
+									id="TF-HealthIssue"
+									placeholder="None"
+									class="sapUiSmallMarginBottom"
+									>
+									<items>
+										<core:Item text="Mental Health"        key="MentalHealth"/>
+										<core:Item text="Substance Misuse"     key="SubstanceMisuse"/>  
+										<core:Item text="Physical Health"      key="PhysicalHealth"/> 
+									</items>
+								</Select>
+								</f:fields>
+							</f:FormElement>
+						
+						</f:formElements>
+					</f:FormContainer>
+				</f:formContainers>
+				
+				
+				</f:Form>
+			</IconTabFilter>
+			</items>
+			</IconTabBar>
+			<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				</Toolbar>
+				</footer>
+			</Page>
+		</detailPages>
+		<masterPages>
+			<Page id="TFProgrammeMenu" title="Menu" icon="sap-icon://action" class="sapUiStdPage" showNavButton="true"
+					navButtonText="Back" navButtonPress="onPressLaunchpadBack">
+				<content>
+				<Toolbar>
+				<Input
+					id="TFProgrammeSearch"
+					width='100%'
+					class="sapUiSmallMarginBegin"
+					placeholder="Enter search terms to find entities">
+				</Input>
+				<Button text="Search" press="onPressSearchEntities" type="Emphasized" setBusy="true" class="sapUiSmallMarginBegin"/>
+				</Toolbar>
+				<Button text="View Program KPIs" type="Transparent" press="onPressNavToTFProgramme3" width="80%" class="sapUiSmallMarginBegin"/>
+				<Button text="New Program Entries" type="Transparent"  press="onPressNavToTFProgramme1" width="80%" class="sapUiSmallMarginBegin"/>
+				<Button text="Update Program Status" type="Transparent" press="onPressNavToTFProgramme2" width="80%" class="sapUiSmallMarginBegin"/>
+					<List id="TFProgrammeEntries">
+						<items>
+						</items>
+					</List>
+				</content>
+			</Page>
+		</masterPages>
+	</SplitApp>
+		<footer>
+			<Toolbar>
+				<ToolbarSpacer/>
+				<Button text="Add entry" type="Accept" press="onPressAddEntry"/>
+				<Button text="Clear form" type="Reject" press="onPressClearForm"/>
+			</Toolbar>
+		</footer>
+	</Page>
+	</mvc:View>
+</script>
+
+<script type="text/javascript">
+        sap.ui.define([
+                        'jquery.sap.global',
+                        'sap/m/MessageToast',
+                        'sap/ui/core/Fragment',
+                        'sap/ui/core/mvc/Controller',
+                        'sap/ui/model/Filter',
+                        'sap/ui/model/json/JSONModel',
+                        "sap/ui/vbm/AnalyticMap",
+                        'sap/ui/richtexteditor/RichTextEditor',
+                        'sap/m/MessageBox',
+                        'sap/m/Dialog',
+                        'sap/m/Button'
+                ], function(jQuery, MessageToast, Fragment, Controller, Filter, JSONModel, AnalyticMap, Device, RTE, MessageBox, Dialog, Button) {
+                "use strict";
+
+
+
+                var CController = Controller.extend("local.controller.app", {
+
+                        onInit: function(){
+
+				var oDeviceModel = new JSONModel(Device);
+				oDeviceModel.setDefaultBindingMode("OneWay");
+				this.getView().setModel(oDeviceModel, "device");
+	
+				var UserDescription = this.byId("ProfileDescription");
+				var UserGUID = this.byId("ProfileGUID");
+				window.UserDescription = UserDescription;
+				window.UserGUID = UserGUID;
+				
+				var UP = {'UserName' : ''};
+				var UserProfile = new sap.ui.model.json.JSONModel(UP);
+
+				
+				var DF = { Spots :
+						[
+							{ "value" : "8", "pos": "37.622882;55.755202;0",  "tooltip": "Moscow", "type":"Inactive"  },
+							{ "value":  "23", "pos": "-74.013327;40.705395;0", "tooltip": "New York", "type":"Error"  },
+							{ "value":  "2", "pos": "8.641568;49.293789;0", "tooltip": "SAP Walldorf", "type":"Success"  }
+						]
+				};
+				var DefaultPoints = new sap.ui.model.json.JSONModel();
+				DefaultPoints.setData(DF);
+				sap.ui.getCore().setModel(DefaultPoints, "DefaultPoints");
+				var LaunchpadMap = this.byId("LaunchpadMap");
+				LaunchpadMap = new sap.ui.vbm.AnalyticMap({
+								width : "90%",
+								centerPosition: "-5;48.8",
+								zoomlevel: 3,
+								vos: [
+									     new sap.ui.vbm.Spots({
+									// bind to an array in the model
+									items: { 
+									     path : "/Spots",
+									     template: new sap.ui.vbm.Spot(  { text: '{value}', position: '{pos}', tooltip: '{tooltip}', type: '{type}'}  )
+									     } } )
+									     ]
+							     });
+				LaunchpadMap.setModel(DefaultPoints);
+				window.LaunchpadMap = LaunchpadMap;
+
+				
+			},
+			
+			onPressToMain: function(){
+				app.to("pProfile");
+				
+
+			},
+			onPressLaunchpadBack: function(){
+				app.to("pLaunchpad")
+			},
+			
+			onPressNavToConDis : function(oEvent) {
+
+				window.open("https://lt5128.wdf.sap.corp:51111/condis/index.html");
+
+			},
+			
+			getSplitAppObj : function() {
+				var result = this.byId("SplitAppTF");
+				if (!result) {
+					jQuery.sap.log.info("SplitApp object can't be found");
+				}
+				return result;
+			},
+			
+			onPressToMain: function(){
+				app.to("pProfile");	
+
+			},
+			
+			onPressNavToTFProgramme3: function(oEvt, onPressNavToDetail){
+				this.getSplitAppObj().to(this.createId("TFProgramme3"));
+				MessageToast.show("View KPIs of the Programme with drill down into records.");	
+			},
+			
+			onPressNavToTFProgramme1: function(oEvt, onPressNavToDetail){
+				this.getSplitAppObj().to(this.createId("TFProgramme1"));
+				MessageToast.show("Enter new data based on program forms.");	
+			},
+			
+			onPressNavToTFProgramme2: function(oEvt){
+				this.getSplitAppObj().to(this.createId("TFProgramme2"));
+				MessageToast.show("View and update program status by rules.");	
+			},
+			
+			onPressLaunchpadBack: function(){
+				app.to("pLaunchpad")
+			},
+			
+			onPressClearForm: function(){
+				this.getView().byId("TF-Forename").setValue("");
+				this.getView().byId("TF-Middlename").setValue("");
+				this.getView().byId("TF-Surname").setValue("");
+				this.getView().byId("TF-DOB").setValue("");
+				this.getView().byId("TF-Parent").setValue("");
+				this.getView().byId("TF-Grandparent").setValue("");
+				this.getView().byId("TF-Dependent").setValue("");
+				this.getView().byId("TF-OtherAdult").setValue("");
+				this.getView().byId("TF-OtherChild").setValue("");
+				this.getView().byId("TF-Address").setValue("");
+				this.getView().byId("TF-PostCode").setValue("");
+				this.getView().byId("TF-StartDate").setValue("");
+				this.getView().byId("TF-EndDate").setValue("");
+				this.getView().byId("TF-AllocatedWorker").setValue("");
+				sap.m.MessageToast.show("Form cleared");
+			
+			},
+			
+			
+			onPressAddEntry: function(){
+				var oThis = this;
+				var F = {}
+				F['TF-Forename']            = this.getView().byId("TF-Forename").getValue();
+				F['TF-Middlename']          = this.getView().byId("TF-Middlename").getValue();
+				F['TF-Surname']             = this.getView().byId("TF-Surname").getValue();
+				F['TF-DOB']                 = this.getView().byId("TF-DOB").getValue();
+				F['TF-Gender']              = this.getView().byId("TF-Gender").getSelectedItem().getText();
+				F['TF-Ethnicity']           = this.getView().byId("TF-Ethnicity").getSelectedItem().getText();
+				F['TF-Parent']              = this.getView().byId("TF-Parent").getValue();
+				F['TF-Grandparent']         = this.getView().byId("TF-Grandparent").getValue();
+				F['TF-Dependent']           = this.getView().byId("TF-Dependent").getValue();
+				F['TF-OtherAdult']          = this.getView().byId("TF-OtherAdult").getValue();
+				F['TF-OtherChild']          = this.getView().byId("TF-OtherChild").getValue();
+				F['TF-Address']             = this.getView().byId("TF-Address").getValue();
+				F['TF-PostCode']            = this.getView().byId("TF-PostCode").getValue();
+				F['TF-HousingTenure']       = this.getView().byId("TF-HousingTenure").getSelectedItem().getText();
+				F['TF-StartDate']           = this.getView().byId("TF-StartDate").getValue();
+				if(this.getView().byId("TF-InterventionStatus").getSelectedItem() == null){
+					F['TF-InterventionStatus']  = ""}
+					else{
+					F['TF-InterventionStatus']  = this.getView().byId("TF-InterventionStatus").getSelectedItem().getText();
+					}
+				F['TF-EndDate']             = this.getView().byId("TF-EndDate").getValue();
+				F['TF-AllocatedWorker']     = this.getView().byId("TF-AllocatedWorker").getValue();
+				F['TF-TFEASupport']         = this.getView().byId("TF-TFEASupport").getSelectedIndex();
+				F['TF-TFEWOSupport']        = this.getView().byId("TF-TFEWOSupport").getSelectedIndex();
+				if(this.getView().byId("TF-IssueCrimeASB").getSelectedItem() == null){
+					F['TF-IssueCrimeASB']  = ""}
+					else{
+					F['TF-IssueCrimeASB']  = this.getView().byId("TF-IssueCrimeASB").getSelectedItem().getText();
+					}
+				if(this.getView().byId("TF-IssueEducation").getSelectedItem() == null){
+					F['TF-IssueEducation']  = ""}
+					else{
+					F['TF-IssueEducation']  = this.getView().byId("TF-IssueEducation").getSelectedItem().getText();
+					}
+				if(this.getView().byId("TF-IssueFinancial").getSelectedItem() == null){
+					F['TF-IssueFinancial']  = ""}
+					else{
+					F['TF-IssueFinancial']  = this.getView().byId("TF-IssueFinancial").getSelectedItem().getText();
+					}
+				if(this.getView().byId("TF-ChildrenNeedHelp").getSelectedItem() == null){
+					F['TF-ChildrenNeedHelp']  = ""}
+					else{
+					F['TF-ChildrenNeedHelp']  = this.getView().byId("TF-ChildrenNeedHelp").getSelectedItem().getText();
+					}
+				if(this.getView().byId("TF-DomesticAbuse").getSelectedItem() == null){
+					F['TF-DomesticAbuse']  = ""}
+					else{
+					F['TF-DomesticAbuse']  = this.getView().byId("TF-DomesticAbuse").getSelectedItem().getText();
+					}
+				if(this.getView().byId("TF-HealthIssue").getSelectedItem() == null){
+					F['TF-HealthIssue']  = ""}
+					else{
+					F['TF-HealthIssue']  = this.getView().byId("TF-HealthIssue").getSelectedItem().getText();
+					}
+					
+				
+				this.onPressClearForm();
+				var aData = jQuery.ajax({
+					type : "POST",
+					url : "/new_programme_entry",
+					dataType : "json",
+					async : true,
+					data : F,
+					success : function(data, textStatus, jqXHR) {
+						if (data['status'] == 200){
+							sap.m.MessageToast.show(data['message']);
+				
+							}
+						}
+				});
+			},
+			
+			onUserNamePress: function(evt) {
+				MessageToast.show("View the profile");
+				var oModel = sap.ui.getCore().getModel("UserData");
+				window.UserDescription.setText(oModel.oData.DESC);
+				window.UserGUID.setText(oModel.oData.GUID);
+				app.to("pProfile");
+				
+			},
+			
+
+			onPressLogOut: function() {
+
+				var jsMENU = jQuery.ajax({
+					type : "POST",
+					url : "/logout",
+					dataType : "json",
+					async : true,
+					success : function(response, textStatus, jqXHR) {
+						MessageToast.show(response['message']);
+						app.to("pLogin");
+					}
+				});
+			},
+			
+			onPressReset: function() {
+
+				var jsMENU = jQuery.ajax({
+					type : "POST",
+					url : "/reset_system",
+					dataType : "json",
+					async : true,
+					success : function(response, textStatus, jqXHR) {
+						MessageToast.show(response['message']);
+					}
+				});
+			},
+			
+			onPressLoadVPData: function() {
+
+				var jsMENU = jQuery.ajax({
+					type : "POST",
+					url : "/initialize_load",
+					dataType : "json",
+					async : true,
+					success : function(response, textStatus, jqXHR) {
+						MessageToast.show(response['message']);
+					}
+				});
+			},
+			
+			
+			TFAlerts: function(evt){
+				MessageToast.show("View and manage alerts");
+				app.to("pTFAlerts");
+			},
+			
+			TFProgramme: function(evt){
+				MessageToast.show("View programme entries and change profiles");
+				app.to("pTFProgramme");
+			},
+			
+			onPressLoadEducation: function(evt){
+			
+				var oRun = {}
+				oRun['Type'] = 'Police'
+				
+				var jsMENU = jQuery.ajax({
+					type : "POST",
+					url : "/extract_file",
+					dataType : "json",
+					data : oRun,
+					async : true,
+					success : function(response, textStatus, jqXHR) {
+						
+						MessageToast.show(response['message']);
+					}
+				});
+				
+			
+				MessageToast.show("Loading Education Data in the background");
+			},
+			
+			onPressLoadPolice: function(evt){
+				
+				var oRun = {}
+				oRun['Type'] = 'Police'
+				
+				var jsMENU = jQuery.ajax({
+					type : "POST",
+					url : "/extract_file",
+					dataType : "json",
+					data : oRun,
+					async : true,
+					success : function(response, textStatus, jqXHR) {
+						
+						MessageToast.show(response['message']);
+					}
+				});
+				
+				
+				MessageToast.show("Load Police Data");
+			},
+			
+			onPressTED_DV: function(evt){
+			
+				var oRun = {}
+				oRun['Type'] = "TED_DV"
+				
+				var jsMENU = jQuery.ajax({
+					type : "POST",
+					url : "/extract_file",
+					dataType : "json",
+					data : oRun,
+					async : true,
+					success : function(response, textStatus, jqXHR) {
+						MessageToast.show(response['message']);
+					}
+				});
+				
+			},
+			
+			onPressTED_DV: function(evt){
+			
+				var oRun = {}
+				oRun['Type'] = "TED_Cohort"
+				
+				var jsMENU = jQuery.ajax({
+					type : "POST",
+					url : "/extract_file",
+					dataType : "json",
+					data : oRun,
+					async : true,
+					success : function(response, textStatus, jqXHR) {
+						MessageToast.show(response['message']);
+					}
+				});
+				
+			},
+			
+
+		});
+		return CController;
+	});
+
+        //------- LOGIN -------//
+       sap.ui.define(['jquery.sap.global', 'sap/ui/core/mvc/Controller', 'sap/m/MessageToast'],
+                function(jQuery, Controller, MessageToast) {
+                "use strict";
+
+                var LoginController = sap.ui.controller("local.controller", {
+
+                        onLoginTap: function() {
+                                var USR = {}
+                                var oThis = this;
+                                USR['UserName'] = this.getView().byId("UserName").getValue();
+                                USR['UserPassword'] = this.getView().byId("UserPassword").getValue();
+                                //Clear the form
+                                this.getView().byId("UserName").setValue("");
+                                this.getView().byId("UserPassword").setValue("");
+
+                                var aData = jQuery.ajax({
+                                        type : "POST",
+                                        url : "/login",
+                                        dataType : "json",
+                                        async : true,
+                                        data : USR,
+                                        success : function(data, textStatus, jqXHR) {
+
+                                                if (data['status'] == 200){
+                                                        sap.m.MessageToast.show(data['message']);
+                                                        
+                                                        //Set the user profile basics for the app model with keys:
+                                                        //[GUID, UserAuth, UserName, UserPassword, UserType]
+                                                        var UserProfile = new sap.ui.model.json.JSONModel(data['data']);
+                                                        sap.ui.getCore().setModel(UserProfile, "UserProfile");
+                                                        app.to("pLaunchpad");
+                                                        
+                                                }
+                                                else{
+                                                        sap.m.MessageToast.show(data['message']);
+                                                        app.to("pLogin");
+                                                }
+
+                                        }
+                                });
+                        }
+
+                });
+
+                return LoginController;
+
+        });
+
+
+
+        // create a mobile app and display the launchpad first
+        app = new sap.m.App("myApp", {
+                initialPage: "pLogin"
+        }).placeAt("content");
+        sap.ui.getCore().attachInit(function() {
+	
+                // Add All available views and then add them as content to the pages
+                 vLP =  sap.ui.xmlview({
+                    viewContent: jQuery("#vLaunchpad").html()
+                  });
+
+                vLOG =  sap.ui.xmlview({
+                   viewContent: jQuery("#vLogin").html()
+                 });
+		 
+		vPRO =  sap.ui.xmlview({
+		    viewContent: jQuery("#vProfile").html()
+		  });
+		  
+		vTFA =  sap.ui.xmlview({
+		    viewContent: jQuery("#vTFAlerts").html()
+		  });
+		  
+		vTFP =  sap.ui.xmlview({
+		    viewContent: jQuery("#vTFProgramme").html()
+		  });
+
+                // Add all the views to the pages
+                pLaunchpad = new sap.m.Page("pLaunchpad",{
+                        content: vLP
+                });
+
+                pLogin = new sap.m.Page("pLogin",{
+                        content: vLOG
+                });
+		
+		pProfile = new sap.m.Page("pProfile",{
+			content: vPRO
+		});
+		
+		pTFAlerts = new sap.m.Page("pTFAlerts",{
+			content: vTFA
+		});
+		
+		pTFProgramme = new sap.m.Page("pTFProgramme",{
+			content: vTFP
+		});
+		
+		// Add the pages to the app
+                app.addPage(pLogin);
+                app.addPage(pLaunchpad);
+		app.addPage(pProfile);
+		app.addPage(pTFAlerts);
+		app.addPage(pTFProgramme);
+                app.placeAt("content");
+        });
+
+</script>
+
+<body class="sapUiBody" id="content">

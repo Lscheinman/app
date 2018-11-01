@@ -1,0 +1,24 @@
+<mvc:View
+    controllerName="sap.m.sample.GenericKPITile.Page"
+    xmlns="sap.m"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:mc="sap.suite.ui.microchart"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns:tnt="sap.tnt"
+    >
+    <tnt:ToolHeader>
+        <Image
+            src="{{ url_for('static', filename='saplogo.svg')}}"
+            width="80px"
+            >
+        </Image>
+    <tnt:ToolHeaderUtilitySeparator />
+        <ToolbarSpacer>
+        </ToolbarSpacer>
+        <Button text="{{ session.username }}" type="Transparent" press="onUserNamePress">
+        </Button>
+        <Button icon="sap-icon://log" press="onPressLogOut" type="Transparent">
+        </Button>
+    </tnt:ToolHeader>
+</mvc:View>

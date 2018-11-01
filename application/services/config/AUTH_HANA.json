@@ -1,0 +1,8 @@
+{
+  "host": "lt5128.wdf.sap.corp",
+  "port": "30015",
+  "user": "SYSTEM",
+  "password": "Welcome03",
+  "userCondis": "CONDIS_INITIAL_SYSTEM_SETUP3",
+  "pswdCondis": "Welcome01"
+}
